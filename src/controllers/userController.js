@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { findById } = require("../models/userModel");
 const userModel = require("../models/userModel");
 
 
@@ -10,7 +11,7 @@ const createUser = async function (abcd, xyz) {
   let data = abcd.body;
   let savedData = await userModel.create(data);
   xyz.send({ msg: savedData });
-};
+}
 
 //Q.2 Write a *POST api /login to login a user that takes user details - email and password from the request body. If the credentials don't match with any user's data return a suitable error. On successful login, generate a JWT token and return it in response body.
 const loginUser = async function (req, res) {
@@ -62,7 +63,6 @@ const updateUser = async function (req, res) {
   let userId = req.params.userId;
   let user = await userModel.findById(userId);
   if(!user) return res.send("No such user exists in db collection");
-
   let userData = req.body;
   let updatedUser = await userModel.findOneAndUpdate({ _id: userId }, userData, {new:true});
   res.send({ status: "updatedUser", data: updatedUser });
@@ -80,6 +80,20 @@ const deleteUser = async function(req, res){
   res.send({status: "userDeleted", msg: markDelete})
 }
 
+//Q.6
+const postMessage = async function(req, res){
+  //update
+  const message = req.body.message;
+  const user = await userModel.findById(req.params.userId)
+  const postsAttribute = user.posts;
+  // const addingPost = post.push(message) -------- and then (post:  addingPost) =>big mistake, because adddingPost(push) gives new array length after adding.
+  postsAttribute.push(message)
+  const addingPost = await userModel.findOneAndUpdate({_id: user._id}, {$set:{posts : postsAttribute}},{new:true}) //{posts : postsAttribute} or {$set: {posts : postsAttribute}} in both way we can write
+  res.send({status: true, msg: addingPost})
+  
+}
+
+
 
 
 module.exports.createUser = createUser;
@@ -87,4 +101,5 @@ module.exports.getUserData = getUserData;
 module.exports.updateUser = updateUser;
 module.exports.loginUser = loginUser;
 module.exports.deleteUser = deleteUser;
+module.exports.postMessage = postMessage;
 

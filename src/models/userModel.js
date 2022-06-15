@@ -15,7 +15,11 @@ const userSchema = new mongoose.Schema( {
         enum: ["male", "female", "other"]
     },
     age: Number,
-    isDeleted: {type: Boolean, default: false}  //added isDeleted field/attribute/key
+    isDeleted: {type: Boolean, default: false},  //added isDeleted field/attribute/key
+    posts : {
+        type: [],
+        default: []
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User2', userSchema)
