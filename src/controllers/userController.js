@@ -36,7 +36,7 @@ const loginUser = async function (req, res) {
       batch: "Radon",
       organisation: "FunctionUp",
     },
-    "functionup-radon"
+    "functionup-radon"  //secret keyword
   );
   res.setHeader("x-auth-token", token);  //SN: we can send response either into Header or just a display response..best practice - into header
   res.send({ status: true, token: token });

@@ -13,4 +13,4 @@ router.get("/users/:userId", middleware.validateToken, userController.getUserDat
 router.put("/users/:userId", middleware.validateToken, userController.updateUser)       //Q.4
 router.delete("/users/:userId", middleware.validateToken, userController.deleteUser);   //Q.5
 
-module.exports = router;
+module.exports = router; 
