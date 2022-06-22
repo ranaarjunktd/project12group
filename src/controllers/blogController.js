@@ -15,7 +15,7 @@ const createBlog = async function (req, res) {
     }
 }
 
-
+/*
 //Returns all blogs in the collection that aren't deleted and are published
 
 const listBlogs = async function(req, res){
@@ -26,27 +26,32 @@ const listBlogs = async function(req, res){
         return res.status(500).send({status:false, error: err.name, msg: err.message})
     }
 }
+*/
 
 
 //Filter blogs list by applying filters. Query param can have any combination of below filters.By author Id, By category, List of blogs that have a specific tag, List of blogs that have a specific subcategory
 
 const listBlogsByQuery = async function(req, res){
     try {
-        const aId = req.query.authorId;
-        const ctg = req.query.category;
-        const tag = req.query.tags;
+        const aId = req.query.authorId; 
+        const ctg = req.query.category; 
+        const tag = req.query.tags;     
         const subCtg = req.query["sub-category"];
 
-        const findQuery = await blogModel.find(
-            {$or: [{authorId:aId},{category:ctg}, {tags:tag}, {"sub-category": subCtg}]}
-        );
+        let filters = {isDeleted:false, isPublished:true};
+        if(aId){filters.authorId = aId};
+        if(ctg){filters.category = {$all: ctg.split(",")}};
+        if(tag){filters.tags = {$all: tag.split(",")}};
+        if(subCtg){filters["sub-category"] = {$all: subCtg.split(",")}};
 
-        res.status(200).send({status:true, data: findQuery})
+        const documents = await blogModel.find(filters);
+        if(Object.keys(documents).length == 0){return res.status(404).send({status:false, msg: "no such documents with specified condiontions"})};
 
+        res.status(200).send({status:true, data: documents})
     } catch (err) {
-        
+        res.status(500).send({status:false, erroor: err.name, msg:error.message})
     }
-}//=============================> need more work , under process.
+}
 
 
 //Updates a blog by changing the its title, body, adding tags, adding a subcategory.Updates a blog by changing its publish status i.e. adds publishedAt date and set published to true
@@ -78,6 +83,10 @@ const updateBlog = async function(req,res){
 
 
 module.exports.createBlog = createBlog;
-module.exports.listBlogs = listBlogs;
+// module.exports.listBlogs = listBlogs;
 module.exports.updateBlog =updateBlog;
 module.exports.listBlogsByQuery = listBlogsByQuery;
+
+
+
+
