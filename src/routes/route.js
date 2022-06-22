@@ -12,6 +12,8 @@ router.post('/createBlogs', blogController.createBlog);
 router.get('/getBlogs', blogController.listBlogsByQuery);
 router.put('/updateBlog/:blogId', blogController.updateBlog);
 
+router.post('/login', authorController.login);
+
 
 
 

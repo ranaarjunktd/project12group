@@ -1,7 +1,7 @@
 {
-  "name": "src",
+  "name": "blog",
   "version": "1.0.0",
-  "description": "Backend cohort for Radon(May-Sep)",
+  "description": "mini blogger project in which we will be making APIs to peroform blog related CRUD activities",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
