@@ -41,6 +41,23 @@ const checkOwner = async function(req, res, next){
     }
 }
 
+const authforQueryDelete = async function(req, res, next){
+    try {
+        console.log("reached mw3");
+        const token = req.headers["x-api-key"];
+        const decode = jwt.verify(token, "topScerect");
+        const loggedInUserId = decode.authorId;
 
+        let authorId = req.query.authorId;
+        if(authorId && authorId.split("").length !==24){return res.status(400).send({status:false, msg: "enter a valid id"})} //validation1
+        if(authorId && (authorId !== loggedInUserId)){return res.status(400).send({status:false, msg: "you are not authorised to delete blogs of different author"})} //val2
+        if(!authorId){authorId = loggedInUserId}; //validation3
+        req.query.authorId = authorId; //updating authorId qeury by loggedInUserId value
+        next();
+    } catch (error) {
+        return res.status(500).send({status:false, error: error.name, msg: error.message})
+    }
+}
 module.exports.checkLogin = checkLogin;
 module.exports.checkOwner = checkOwner;
+module.exports.authForQueryDelete = authforQueryDelete;

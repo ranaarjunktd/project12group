@@ -15,10 +15,9 @@ router.get('/getBlogs', middleware.checkLogin, blogController.listBlogsByQuery);
 //edit blogs, delete blogs
 router.put('/updateBlog/:blogId', middleware.checkLogin, middleware.checkOwner, blogController.updateBlog);
 router.delete('/blogs/:blogId', middleware.checkLogin, middleware.checkOwner, blogController.deleteById );
-router.delete('/blogs/deleteByQuery', middleware.checkLogin, blogController.deleteByQuery);//incomplete
 
 
-router.delete('/deleteTest/query', middleware.checkLogin, blogController.deleteByQuery);
+router.delete('/deleteBlogs/query', middleware.checkLogin, middleware.authForQueryDelete, blogController.deleteByQuery);
 
 
 

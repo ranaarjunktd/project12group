@@ -11,8 +11,8 @@ const isValid = function (value) {
 }
 
 
-const createBlog = async function (req, res) {      //trim=>handle only space in string like "   "
-    try {
+const createBlog = async function (req, res) {      
+    try {                                                                                                   //trim=>handle only space in string like "   "
         const content = req.body;       //empty object
         if (Object.keys(content).length === 0) { return res.staus(400).send({ status: false, msg: "no content in the document" }); } //validation1
 
@@ -26,19 +26,6 @@ const createBlog = async function (req, res) {      //trim=>handle only space in
         return res.status(500).send({ status: false, error: err.name, msg: err.message })
     }
 }
-
-/*
-//Returns all blogs in the collection that aren't deleted and are published
-
-const listBlogs = async function(req, res){
-    try {
-        const list = await blogModel.find({isDeleted:false, isPublished:true});
-        return res.status(200).send({status:true, data: list});
-    } catch (err) {
-        return res.status(500).send({status:false, error: err.name, msg: err.message})
-    }
-}
-*/
 
 
 //Filter blogs list by applying filters. Query param can have any combination of below filters.By author Id, By category, List of blogs that have a specific tag, List of blogs that have a specific subcategory
@@ -121,9 +108,8 @@ const deleteById = async function(req,res){
 
 //dlete 2 => done by aman
 const deleteByQuery = async function(req, res){
-    try {
-        console.log("reached handler of deleteByQuery")
-        const authorId = req.query.authorId;
+    try {            
+        const authorId = req.query.authorId;                            
         const ctg = req.query.category;
         const tag = req.query.tags;
         const subCtg = req.query["sub-category"];
@@ -134,19 +120,14 @@ const deleteByQuery = async function(req, res){
         if(ctg){filters.category = {$all: ctg.split(",")}};
         if(tag){filters.tags = {$all:ctg.split(",")}};
         if(subCtg){filters["sub-category"] = {$all:subCtg.split(",")}};
-        if(pub){filters.isPublished = pub};
+        if(pub){filters.isPublished = pub};                           
 
-        const filteredBlogs = await blogModel.find(filters);   //filters
+        const filteredBlogs = await blogModel.find(filters);           //filters 
         if(!filteredBlogs){return res.status(404).send({status:false,   msg: "no match found for deleting" })}
-        const blogAuthorId = filteredBlogs[0]["authorId"].toString();
 
-        const token = req.headers["x-api-key"];
-        const decode = jwt.verify(token, "topScerect");
-        const loggedInUser = decode.authorId;
+        const d = new Date; const dateTime = d.toLocaleString();
 
-        if(blogAuthorId !== loggedInUser){return res.status(403).send({status:false, msg:"you are not authorised to delete others blog"})}
-
-        const deletedBlogs = await blogModel.updateMany({filters},{$set:{isDeleted:false}});
+        const deletedBlogs = await blogModel.updateMany(filters,{$set:{isDeleted:true, deletedAt: dateTime}});
         res.status(200).send({status:true, msg: "deleted successfully", msg2: deletedBlogs});
 
         
@@ -155,6 +136,8 @@ const deleteByQuery = async function(req, res){
         return res.status(500).send({status:false, error:error.name, msg: error.message});
     }
 }
+//remainings
+//write dateTime in common function; //when isDeleted = false updating, then automatically update deletedAt = "N.A"
 
 
 
