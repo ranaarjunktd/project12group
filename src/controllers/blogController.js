@@ -16,7 +16,7 @@ const createBlog = async function (req, res) {
         const content = req.body;       //empty object
         if (Object.keys(content).length === 0) { return res.staus(400).send({ status: false, msg: "no content in the document" }); } //validation1
 
-        if(!isValid(content.title) || !content.body || !content.authorId || !content.category){
+        if(!isValid(content.title) || !isValid(content.body) || !isValid(content.authorId) || !isValid(content.category)){
             return res.status(400).send({status:false, msg: "name, body, authorId and category must be entered, you cannot left these field empty"})
         }// validation2
 
