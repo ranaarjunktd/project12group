@@ -11,6 +11,7 @@ const isValid = function (value) {
 }
 
 
+
 const createBlog = async function (req, res) {      
     try {                                                                                                   //trim=>handle only space in string like "   "
         const content = req.body;       //empty object
@@ -109,7 +110,7 @@ const deleteById = async function(req,res){
 //dlete 2 => done by aman
 const deleteByQuery = async function(req, res){
     try {            
-        const authorId = req.query.authorId;                            
+        const authorId = req.query.authorId;         //use destructuring to make it compact                 
         const ctg = req.query.category;
         const tag = req.query.tags;
         const subCtg = req.query["sub-category"];
@@ -122,17 +123,17 @@ const deleteByQuery = async function(req, res){
         if(subCtg){filters["sub-category"] = {$all:subCtg.split(",")}};
         if(pub){filters.isPublished = pub};                           
 
-        const filteredBlogs = await blogModel.find(filters);           //filters 
+        const filteredBlogs = await blogModel.findOne(filters);           //filters 
         if(!filteredBlogs){return res.status(404).send({status:false,   msg: "no match found for deleting" })}
 
         const d = new Date; const dateTime = d.toLocaleString();
 
         const deletedBlogs = await blogModel.updateMany(filters,{$set:{isDeleted:true, deletedAt: dateTime}});
-        res.status(200).send({status:true, msg: "deleted successfully", msg2: deletedBlogs});
+        return  res.status(200).send({status:true, msg: "deleted successfully", msg2: deletedBlogs});
 
         
     } catch (error) {
-        console.log(error);
+        console.log(error);//remove it
         return res.status(500).send({status:false, error:error.name, msg: error.message});
     }
 }
@@ -142,7 +143,8 @@ const deleteByQuery = async function(req, res){
 
 
 
-
+const d = new Date()
+console.log(d)
 
 
 
