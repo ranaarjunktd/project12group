@@ -1,14 +1,7 @@
 const authorModel = require('../models/authorModel.js');
-
 const blogModel = require('../models/blogModel.js');
 const jwt = require('jsonwebtoken');
 
-const isValid = function (value) {
-    if (typeof value === "undefined" || value === null) return false
-    if (typeof value === "string" && value.trim().length === 0) return false
-    if (typeof value === Number && value.trim().length === 0) return false
-    return true
-}
 
 
 
@@ -88,10 +81,9 @@ const updateBlog = async function (req, res) {
     }
 }
 
-//delete 1 => done by aman
+
 const deleteById = async function(req,res){
     try {
-        // console.log("reached handler")//working
         const id = req.params.blogId;
         const blog = await blogModel.findById(id);
         if(!blog || blog.isDeleted === true){return res.status(404).send({status:false, msg: "no such blog exists"})};//validation1
@@ -107,7 +99,7 @@ const deleteById = async function(req,res){
 }
 
 
-//dlete 2 => done by aman
+
 const deleteByQuery = async function(req, res){
     try {            
         const authorId = req.query.authorId;         //use destructuring to make it compact                 
@@ -119,7 +111,7 @@ const deleteByQuery = async function(req, res){
         let filters = {isDeleted:false};
         if(authorId){filters.authorId = authorId};
         if(ctg){filters.category = {$all: ctg.split(",")}};
-        if(tag){filters.tags = {$all:ctg.split(",")}};
+        if(tag){filters.tags = {$all: tag.split(",")}};
         if(subCtg){filters["sub-category"] = {$all:subCtg.split(",")}};
         if(pub){filters.isPublished = pub};                           
 
@@ -143,17 +135,11 @@ const deleteByQuery = async function(req, res){
 
 
 
-const d = new Date()
-console.log(d)
-
-
-
 
 
 
 
 module.exports.createBlog = createBlog;
-// module.exports.listBlogs = listBlogs;
 module.exports.updateBlog = updateBlog;
 module.exports.listBlogsByQuery = listBlogsByQuery;
 module.exports.deleteById = deleteById
