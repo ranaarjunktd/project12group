@@ -31,8 +31,6 @@ const login = async function (req, res) {
         if (!author) { return res.status(404).send({ status: false, msg: "invalid userEmail or password" }) }; //validation2
 
         const token = jwt.sign({ authorId: author._id.toString(), collection: "authors", project: "Blog" }, "topScerect");
-      //   const decode = jwt.verify(token, "topScerect");
-      //   console.log(decode.authorId);
 
         res.setHeader("x-api-key", token);
         res.status(200).send({ status: true, msg: "congratulations!!! your login is succesful" });
@@ -42,19 +40,3 @@ const login = async function (req, res) {
 }
 module.exports.createAuthor = createAuthor;
 module.exports.login =login;
-
-
-
-/*to edit a blog
-
-mw1: loggedInUser will send token...token will be verified to authenticate his login.
-
-mw2:
-edit is restricted activity to owner only. & for udating user will send blogId in params.
-docs = blogModel.findById(blogId)====> authorId who is owner.
-decode token coming from request => logged in authorId
-if(loggedId === ownerId) next(); 
-
-handler function:
-update...
-*/

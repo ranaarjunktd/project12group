@@ -1,17 +1,17 @@
 const mongoose = require('mongoose'); require('mongoose-type-email');
 
 const authorSchema = new mongoose.Schema({
-    firstName: {type: String, required: true},  //use regex for name validation
+    firstName: {type: String, required: true},  
     lastName: {type: String, required: true},
     title: {
         type: String,
         required: true,
-        enum: ["Mr", "Mrs", "Miss"]     //use simple logic to validate it
+        enum: ["Mr", "Mrs", "Miss"]     
         },
     email: {
-        type: mongoose.SchemaTypes.Email,   //use regex for proper format
+        type: mongoose.SchemaTypes.Email,   
         required: true,
-        unique: true        //make db call
+        unique: true      
     },
     password:{type: String, required: true}
 }, {timestamps: true});

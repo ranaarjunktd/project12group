@@ -15,14 +15,13 @@ function isName(x){
 }
 // console.log(isName("  A  "));//false, because min 2 \w required
 // console.log(isName("  bbAb  "));//false, because 1capital case must be required in start of alphabets
-// console.log(isName("  A."));true
-// console.log(isName("  A.P.J abdul"));true
+// console.log(isName("  Ak ash  "));//true===>"Ak ash"
+// console.log(isName("  A.P.J abdul"));//true
 /*\s => space;  \w => a-zA-Z0-9 and _   */
 
 
-
 //to validate title
-function isTitle(x) {
+function isTitle(x) {   //"  Mr     "=>trim =>test =>pass
     if(x){x = x.trim()}; //trimming of the title before test
     if (x !== "Mr" && x !== "Mrs" && x !== "Miss") { return false };
     return true
@@ -35,10 +34,10 @@ function isTitle(x) {
 function isPassword(x) {
     // if (!x) { return false }; //no need this because undefined and null will behandled by regex
     // if (x.trim().length !== x.length) { return false } //no need, below regex won't allow space
-    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[\w!@#$%^&*]{8,255}$/ //for password space not allowed
+    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[\w!@#$%^&*]{8,20}$/ //for password space not allowed
     return re.test(x);
 }
-// console.log(isPassword("Asdf@12345_")); //clear...true
+// console.log(isPassword("Asdf@12345")); //clear...true
 // console.log(isPassword(undefined)); //clear..false
 
 
@@ -50,12 +49,12 @@ function isEmail(x) {
     if(at[0].length >64 ){return false};
     if(at[1].length>255){return false}
 
-    const regEx = /^\s*[a-zA-Z0-9]+([\.\-\_][a-zA-Z0-9]+)*@[a-z]+\.[a-z]{2,3}\s*$/;
-    return regEx.test(x);
+    // const regEx = /^\s*[a-zA-Z0-9]+([\.\-\_][a-zA-Z0-9]+)*@[a-z]+\.[a-z]{2,3}\s*$/;
+    // return regEx.test(x);
 }
 // console.log(isEmail("123456781234567812345678123456781234sssssssssssssssssssssssssssssssssssssssssssssssssssssss56781345678ik.ak@gmail.com"))//false
 // console.log(isEmail("  iKKABCD.ak@gmail.com"))//true
-
+//==================================functions for Blog validations==========================================================================/
 function isBody(x){
     if(!x){return false}
     if(x.trim().length === 0 || x.trim().length <2){return false}
@@ -64,24 +63,25 @@ function isBody(x){
     return true;
 }
 // console.log(isBody("This is my blog #12js"))//true
-// console.log(isBody("12345##!@$"))//false
+// console.log(isBody("1234  5##!@$"))//false
 
 function isArrString(x){
-    if(!x){return false};
+    if(!x){return false};   //check for presence
     if(!Array.isArray(x)){return false};
     if(x.length === 0){return false};
     for(let i=0; i<x.length; i++){
         if(typeof x[i] !== "string"){return false};
-        if(x[i].trim().length === 0){return false};
+        if(x[i].trim().length !== x[i].length){return false};
     }
     return true;
 }
-// console.log(isArrField(["  "])) //false
-const x = Date.now(); const y = 12/05/2022; const z = 2022-06-23;
-console.log(typeof x ); //number
-console.log(typeof y ); //number
+// console.log(isArrString(["ok"])) //false; 
+// console.log(typeof "123")
+// const x = Date.now(); const y = 12/05/2022; const z = 2022-06-23;
+// console.log(typeof x ); //number
+// console.log(typeof y ); //number
 
-
+//"   test 1   "=>regEx pass=> trim()=>"test 1"=> db save
 
 //Middleware for validation of data before creating auhtor
 const validateAuthor = async function (req, res, next) {
@@ -133,11 +133,11 @@ const validateBlog = async function (req, res, next) {
 
         if (!isBody(details.body)) { return res.status(400).send({ status: false, msg: "body is mandatory and must contains alphabets" }) };
        
-        if (!mongoose.Types.ObjectId.isValid(details.authorId)) { return res.status(400).send({ status: false, msg: "valid author id is required" }) };
+        if (!mongoose.Types.ObjectId.isValid(details.authorId)) { return res.status(400).send({ status: false, msg: "author id is mandatory and make sure it must be a valid mongoDB Id" }) };  //also validates for undefined and null cases
 
-        if (!isArrString(details.tags)) { return res.status(400).send({ status: false, msg: "tags with array of strings are mandatory" }) };
+        if (!isArrString(details.tags)) { return res.status(400).send({ status: false, msg: "tags must be in array of strings with appropriate elements" }) };
 
-        if (!isArrString(details.category)) { return res.status(400).send({ status: false, msg: "category with appropriate array of strings are mandatory" }) };
+        if (!isArrString(details.category)) { return res.status(400).send({ status: false, msg: "category must be in array of strings with appropriate elements" }) };
 
         if(details["sub-category"]){
             if(!isArrString(details["sub-category"])){ return res.status(400).send({status:false, error: "subcategory must be in array of strings with appropriate elements"})}
@@ -149,10 +149,10 @@ const validateBlog = async function (req, res, next) {
             if(typeof details.isPublished !== "boolean"){return res.status(400).send({status:false, error: "isPublished value must be Boolean either true or false"})}
         }
         if(details.isDeleted){
-            return res.status(403).send({status:false, error: "you are not allowed to add this field at creating of blog"})
+            return res.status(403).send({status:false, error: "you are not allowed to add isDeleted field at creating of blog"})
         }
         if(details.deletedAt){
-            return res.status(403).send({status:false, error: "you are not authorised to add this field"})
+            return res.status(403).send({status:false, error: "you are not authorised to add deletedAt field"})
         }
         next();
     } catch (error) {
@@ -171,7 +171,7 @@ const checkLogin = function (req, res, next) {
         const decode = jwt.verify(token, "topScerect");
         next();
     } catch (error) {
-        return res.status(500).send({ status: false, error: error.name, msg: error.message }) //if err.name is decode=>
+        return res.status(500).send({ status: false, error: error.name, msg: error.message }) 
     }
 }
 
@@ -180,10 +180,11 @@ const checkOwner = async function (req, res, next) {
     try {
         const token = req.headers["x-api-key"];
         const blogId = req.params.blogId;
-        if (!blogId) { return res.status(200).send({ status: false, msg: "enter blog Id" }) }; //validation1
-        if (blogId.split("").length !== 24) { return res.status(400).send({ status: false, msg: "enter a valid id" }) } //validation2
+        // if (!blogId) { return res.status(200).send({ status: false, msg: "enter blog Id" }) }; //validation1
+        if (mongoose.Types.ObjectId.isValid(blogId)) { return res.status(400).send({ status: false, msg: "enter a valid id" }) } //validation1
 
         const blog = await blogModel.findById(blogId);
+        if(!blog){return res.status(404).send({status:false, error: "no resource found"})} //val2
         const blogOwnerId = blog.authorId.toString();
 
         const decode = jwt.verify(token, "topScerect");
@@ -196,6 +197,7 @@ const checkOwner = async function (req, res, next) {
             return res.status(403).send({ status: false, msg: "you are not authorised to make changes in this blog" }) //validation3
         }
     } catch (error) {
+        console.log(error);
         return res.status(500).send({ status: false, error: error.name, msg: error.message })
     }
 }
@@ -213,6 +215,7 @@ const authforQueryDelete = async function (req, res, next) {
         req.query.authorId = authorId; //updating authorId qeury by loggedInUserId value
         next();
     } catch (error) {
+        console.log(error);
         return res.status(500).send({ status: false, error: error.name, msg: error.message })
     }
 }

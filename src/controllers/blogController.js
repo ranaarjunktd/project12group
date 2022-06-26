@@ -52,12 +52,10 @@ const listBlogsByQuery = async function (req, res) {
 const updateBlog = async function (req, res) {
     try {
         const Id = req.params.blogId;
-        if(Id.split("").length != 24){return res.status(400).send({status:false, msg:"enter a valid authorId"})};  //Validation1    //use mongooseObject Id format
         let data = req.body;
-        if (Object.keys(data).length === 0) { return res.status(400).send({ status: false, msg: "cannot update empty body" }) };   //validation2
+        if (Object.keys(data).length === 0) { return res.status(400).send({ status: false, msg: "cannot update empty body" }) };   //validation1
 
-        const blog = await blogModel.findById(Id);
-        if (!blog) { return res.status(404).send({ status: false, error: "blog not found" }) };    //validation3
+        const blog = await blogModel.findById(Id);  //already validated in mw-checkOwner
 
         if (data.tags) {
             data.tags = [...blog.tags, ...data.tags];
@@ -73,6 +71,7 @@ const updateBlog = async function (req, res) {
         return res.status(200).send({ status: true, data: updated });
 
     } catch (err) {
+        console.log(err);
         return res.status(500).send({ status: false, error: err.name, msg: err.message })  //server error
     }
 }
@@ -86,23 +85,21 @@ const deleteById = async function(req,res){
         
         const d = new Date; const dateTime = d.toLocaleString();
 
-        const deleteBlog = await blogModel.findByIdAndUpdate(id, {$set: {isDeleted: true, deletedAt: dateTime}},{new:true});
+        const deleteBlog = await blogModel.findByIdAndUpdate(id, {$set: {isDeleted: true, deletedAt: dateTime}});
         return res.status(200).send({status:true, msg: "blog deleted successfully"});
 
     } catch (error) {
+        console.log(error);
         return res.status(500).send({status:false, error: error.name, msg: error.message})
     }
 }
 
 
 
+
 const deleteByQuery = async function(req, res){
     try {            
-        const authorId = req.query.authorId;         //use destructuring to make it compact                 
-        const ctg = req.query.category;
-        const tag = req.query.tags;
-        const subCtg = req.query["sub-category"];
-        const pub = req.query.isPublished;
+        let {authorId, ctg, tag, subCtg, pub} = req.query;
 
         let filters = {isDeleted:false};
         if(authorId){filters.authorId = authorId};
@@ -112,12 +109,12 @@ const deleteByQuery = async function(req, res){
         if(pub){filters.isPublished = pub};                           
 
         const filteredBlogs = await blogModel.findOne(filters);           //filters 
-        if(!filteredBlogs){return res.status(404).send({status:false,   msg: "no match found for deleting" })}
+        if(!filteredBlogs){return res.status(404).send({status:false,   msg: "no match found for deleting" })}  //validation
 
         const d = new Date; const dateTime = d.toLocaleString();
 
-        const deletedBlogs = await blogModel.updateMany(filters,{$set:{isDeleted:true, deletedAt: dateTime}});
-        return  res.status(200).send({status:true, msg: "deleted successfully", msg2: deletedBlogs});
+        const deleted = await blogModel.updateMany(filters,{$set:{isDeleted:true, deletedAt: dateTime}});
+        return  res.status(200).send({status:true, msg: "deleted successfully", msg2: deleted});
 
         
     } catch (error) {
@@ -125,8 +122,7 @@ const deleteByQuery = async function(req, res){
         return res.status(500).send({status:false, error:error.name, msg: error.message});
     }
 }
-//remainings
-//write dateTime in common function; //when isDeleted = false updating, then automatically update deletedAt = "N.A"
+
 
 
 
