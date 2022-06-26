@@ -7,16 +7,11 @@ const jwt = require('jsonwebtoken');
 
 const createBlog = async function (req, res) {      
     try {                                                                                                   //trim=>handle only space in string like "   "
-        const content = req.body;       //empty object
-        if (Object.keys(content).length === 0) { return res.staus(400).send({ status: false, msg: "no content in the document" }); } //validation1
-
-        if(!isValid(content.title) || !isValid(content.body) || !isValid(content.authorId) || !isValid(content.category)){
-            return res.status(400).send({status:false, msg: "name, body, authorId and category must be entered, you cannot left these field empty"})
-        }// validation2
-
+        const content = req.body;       
         const savedData = await blogModel.create(content);
-        res.status(201).send({ status: true, data: savedData });
+        return res.status(201).send({ status: true, data: savedData });
     } catch (err) {
+        console.log(err)
         return res.status(500).send({ status: false, error: err.name, msg: err.message })
     }
 }
@@ -43,10 +38,11 @@ const listBlogsByQuery = async function (req, res) {
         const documents = await blogModel.find(filters);    //empty array
         if (documents.length == 0) { return res.status(404).send({ status: false, msg: "no such documents with specified condiontions" }) };  //validation2
 
-        res.status(200).send({ status: true, data: documents })
+        return res.status(200).send({ status: true, data: documents })
     } catch (err) {
-        res.status(500).send({ status: false, erroor: err.name, msg: err.message})
         console.log(err)
+        return res.status(500).send({ status: false, erroor: err.name, msg: err.message})
+        
     }
 }
 
@@ -74,7 +70,7 @@ const updateBlog = async function (req, res) {
         }
 
         const updated = await blogModel.findByIdAndUpdate(Id, { $set: { ...data, isPublished: true, publishedAt: Date.now() } }, { new: true });
-        res.status(200).send({ status: true, data: updated });
+        return res.status(200).send({ status: true, data: updated });
 
     } catch (err) {
         return res.status(500).send({ status: false, error: err.name, msg: err.message })  //server error
