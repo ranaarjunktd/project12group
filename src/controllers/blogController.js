@@ -31,9 +31,9 @@ const listBlogsByQuery = async function (req, res) {
             if(aId.split("").length != 24){return res.status(400).send({status:false, msg:"enter a valid authorId"})};  //Validation1
             filters.authorId = aId
         };
-        if (ctg) { filters.category = { $all: ctg.split(",") } };
-        if (tag) { filters.tags = { $all: tag.split(",") } };
-        if (subCtg) { filters["sub-category"] = { $all: subCtg.split(",") } };
+        if (ctg) { filters.category = { $all: ctg.split(",").map((x)=>x.trim()) } };
+        if (tag) { filters.tags = { $all: tag.split(",").map((x)=>x.trim()) } };
+        if (subCtg) { filters["sub-category"] = { $all: subCtg.split(",").map((x)=>x.trim()) } };
 
         const documents = await blogModel.find(filters);    //empty array
         if (documents.length == 0) { return res.status(404).send({ status: false, msg: "no such documents with specified condiontions" }) };  //validation2
@@ -99,14 +99,15 @@ const deleteById = async function(req,res){
 
 const deleteByQuery = async function(req, res){
     try {            
-        let {authorId, ctg, tag, subCtg, pub} = req.query;
+        let {authorId, category, tags, isPublished} = req.query;
+        const subCtg = req.query["sub-category"];
 
         let filters = {isDeleted:false};
         if(authorId){filters.authorId = authorId};
-        if(ctg){filters.category = {$all: ctg.split(",")}};
-        if(tag){filters.tags = {$all: tag.split(",")}};
-        if(subCtg){filters["sub-category"] = {$all:subCtg.split(",")}};
-        if(pub){filters.isPublished = pub};                           
+        if(category){filters.category = {$all: category.split(",").map((x)=>x.trim())}};
+        if(tags){filters.tags = {$all: tags.split(",").map((x)=>x.trim())}};
+        if(subCtg){filters[subCtg] = {$all:subCtg.split(",").map((x)=>x.trim())}};
+        if(isPublished){filters.isPublished = isPublished};                           
 
         const filteredBlogs = await blogModel.findOne(filters);           //filters 
         if(!filteredBlogs){return res.status(404).send({status:false,   msg: "no match found for deleting" })}  //validation

@@ -13,7 +13,7 @@ router.post('/authorLogin', authorController.login);
 router.post('/createBlogs', middleware.checkLogin, middleware.validateBlog, blogController.createBlog);
 router.get('/getBlogs', middleware.checkLogin, blogController.listBlogsByQuery);
 //edit blogs, delete blogs
-router.put('/updateBlog/:blogId', middleware.checkLogin, middleware.checkOwner, blogController.updateBlog);
+router.put('/updateBlog/:blogId', middleware.checkLogin, middleware.checkOwner, middleware.validateToUpdate, blogController.updateBlog);
 router.delete('/blogs/:blogId', middleware.checkLogin, middleware.checkOwner, blogController.deleteById);
 router.delete('/deleteBlogs/query', middleware.checkLogin, middleware.authForQueryDelete, blogController.deleteByQuery);
 
