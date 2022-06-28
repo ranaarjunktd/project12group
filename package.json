@@ -1,21 +1,26 @@
 {
-  "name": "blog",
+  "name": "project2",
   "version": "1.0.0",
-  "description": "mini blogger project in which we will be making APIs to peroform blog related CRUD activities",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js"
+    "start": "nodemon src/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ibrahim6231/project-blog.git"
+  },
+  "keywords": [],
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ibrahim6231/project-blog/issues"
+  },
+  "homepage": "https://github.com/Ibrahim6231/project-blog#readme",
   "dependencies": {
-    "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.2.3",
-    "mongoose-type-email": "^1.1.2",
-    "nodemon": "^2.0.16"
+    "express": "^4.18.1",
+    "mongoose": "^6.4.1",
+    "nodemon": "^2.0.18"
   }
 }
