@@ -9,18 +9,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ibrahim6231/project-blog.git"
+    "url": "git+https://github.com/ranaarjunktd/project12group.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Ibrahim6231/project-blog/issues"
+    "url": "https://github.com/ranaarjunktd/project12group/issues"
   },
-  "homepage": "https://github.com/Ibrahim6231/project-blog#readme",
+  "homepage": "https://github.com/ranaarjunktd/project12group#readme",
   "dependencies": {
     "express": "^4.18.1",
     "mongoose": "^6.4.1",
-    "nodemon": "^2.0.18"
+    "nodemon": "^2.0.18",
+    "validator": "^13.7.0"
   }
 }
