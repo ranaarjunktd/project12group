@@ -1,7 +1,7 @@
 
 const mongoose=require('mongoose')
 const collegeModel = require("../model/collegeModel")
-// const internModel = require("../model/internModel")
+const internModel = require("../model/internModel")
 
 const createCollege = async function (req,res){
 
@@ -22,7 +22,13 @@ const createCollege = async function (req,res){
         res.status(400).send({status:false , msg:"logoLink is required"})
     }
 
-    let regexName = /^\s*(?=[A-Z])[\w\.\s]{2,64}\s*$/
+    
+    let regexName = /^\s*([a-zA-Z\s\,])([^0-9]){2,64}\s*$/
+
+
+
+    // iind regex for the url
+    // const urlRegex = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w -])?\??(?:[-\+=&;%@.\w])#?(?:[\w]*))?)/
 
 
 

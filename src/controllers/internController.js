@@ -49,8 +49,10 @@ const createIntern = async function (req,res){
 
      // Mobile DUPLICAY AND SYNTAX for validation
 
-    let regexMobile = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
+    // let regexMobile = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
     
+        let regexMobile = /^(?:(?:\+|0{0,2})91(\s*|[\-])?|[0]?)?([6789]\d{2}([ -]?)\d{3}([ -]?)\d{4})$/
+
     if(!regexMobile.test(req.body.mobile)){
         
         return res.status(400).send({ status: false, msg: "Mobile is not valid" })
@@ -65,7 +67,7 @@ const createIntern = async function (req,res){
 
 
   let collegeCheck = await internModel.findById({_id:req.body.collegeId})
-
+  console.log(collegeCheck)
   if(!collegeCheck){
 
       let college = await internModel.create(data)
@@ -78,4 +80,10 @@ const createIntern = async function (req,res){
 
 }
 
+// const collegeDetails = async function (req,res){
+
+
+// }
+
 module.exports.createIntern = createIntern
+// module.exports.collegeDetails = collegeDetails
