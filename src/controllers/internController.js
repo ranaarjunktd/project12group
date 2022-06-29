@@ -3,14 +3,15 @@ const collegeModel = require("../model/collegeModel")
 const internModel = require("../model/internModel")
 
 const createIntern = async function (req,res){
-
+try{
     let data = req.body
 
      // Edge cases
+     //if user or student given a empty body
      if(Object.keys(data).length==0){
         res .status(400).send({ status:false , msg:"Please provide the college details"})
     }
-
+    //each required feild is mandetory
     if(!req.body.name){
         res.status(400).send({status:false , msg:"Name is required"})
     }
@@ -32,9 +33,7 @@ const createIntern = async function (req,res){
         res.status(400).send({status:false , msg:"Name should be alphabat type"})
     }
 
-    // EMAIL DUPLICAY AND SYNTAX for validation
-
-
+    // checking email is in right format or not and also the email is unique or not
 
      if (!(/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(req.body.email))) {
         return res.status(400).send({ status: false, msg: "please Enter Valid Email" })
@@ -47,7 +46,7 @@ const createIntern = async function (req,res){
     }
 
 
-     // Mobile DUPLICAY AND SYNTAX for validation
+     //checking mobile is in right format or not and also the mobile is present or not in our database
 
     let regexMobile = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
     
@@ -64,7 +63,7 @@ const createIntern = async function (req,res){
 
 
 
-  let collegeCheck = await internModel.findById({_id:req.body.collegeId})
+  let collegeCheck = await internModel.findById({_id:req.body.collegeId}) //check
 
   if(!collegeCheck){
 
@@ -74,8 +73,13 @@ const createIntern = async function (req,res){
       else{
           res.status(400).send({status:false , msg:"collegeId is already register"})
       }
-
+} catch (err) {
+    console.log("This is the error :", err.message);
+    res.status(500).send({ msg: "Error", error: err.message });
+}
 
 }
 
 module.exports.createIntern = createIntern
+
+//mobile: /^[0]?[6789]\d{9}$/
