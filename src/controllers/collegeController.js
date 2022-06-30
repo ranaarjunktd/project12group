@@ -1,95 +1,131 @@
-
-const mongoose= require('mongoose')
+const mongoose = require('mongoose')
 const collegeModel = require("../model/collegeModel")
-//const internModel = require("../model/internModel")
+const internModel = require("../model/internModel")
 
-const createCollege = async function (req,res){
-try{
-    let data = req.body
-
-    // Edge cases
-    //this is for if user or student provide given an empty body
-    if(Object.keys(data).length==0){
-        res .status(400).send({ status:false , msg:"Please provide the college details"})
-    }
-    //particular each required feild is mandetory
-    if(!req.body.name){
-        res.status(400).send({status:false , msg:"Name is required"})
-    }
-    if(!req.body.fullName){
-        res.status(400).send({status:false , msg:"FullName is required"})
-    }
-    if(!req.body.logoLink){
-        res.status(400).send({status:false , msg:"logoLink is required"})
-    }
-    //checking name and fullname in alphabet only
-    if(!(/^\s*(?=[A-Z])[\w\.\s]{2,64}\s*$/.test(req.body.name))){
-        res.status(400).send({status:false , msg:"Name should be alphabat type"})
-    }
-    if(!(/^\s*(?=[A-Z])[\w\.\s]{2,64}\s*$/.test(req.body.fullName))){
-        res.status(400).send({status:false , msg:"fullname should be alphabat type"})
-    }
-
-    //checking the name is unique or not
-    let nameCheck = await collegeModel.findOne({name:req.body.name})
-    if(!nameCheck){
-        let college = await collegeModel.create(data)
-        res.status(200).send({status:true, msg:"college create successfully",data:college})
-        }
-        else{
-            res.status(400).send({status:false , msg:"Name should be unique"})
-        }
-} catch (err) {
-    console.log("This is the error :", err.message);
-    res.status(500).send({ msg: "Error", err: err.message });
-}     
-
-}
-
-let regType01 = /^[A-Za-z]{2,}$/ // for college abbrivation
-
-const getData = async function (req, res) {
+const createCollege = async function (req, res) {
     try {
-        let data = req.query.collegeName;
+        // Edge cases
+        let data = req.body
 
-        if (!data || !regType01.test(data)) {
-            return res.status(400).send({ status: false, message: "querry params need a valid College Abbriviation Name" })
+        //this is for if user or student provide given an empty body
+        if (Object.keys(data).length == 0) {
+           return res.status(400).send({ status: false, msg: "Please provide the college details" })
+        };
+        //particular each required feild is mandetory
+        if (!data.name) {
+           return res.status(400).send({ status: false, msg: "Name is required" })
+        };
+        if (!data.fullName) {
+           return res.status(400).send({ status: false, msg: "FullName is required" })
+        };
+        if (!data.logoLink) {
+           return res.status(400).send({ status: false, msg: "logoLink is required" })
+        };
+        //checking name and fullname in alphabet only
+
+        if (!(/^\s*([a-zA-Z\s\,]){2,64}\s*$/.test(data.name))) {
+           return res.status(400).send({ status: false, msg: "Name should be in alphabat type" })
+        };
+        if (!(/^\s*([a-zA-Z\s\,]){2,64}\s*$/.test(data.fullName))) {
+           return res.status(400).send({ status: false, msg: "fullname should be in alphabat type" })
+        };
+
+        //checking logo format
+        if (!(/^https?:\/\/(.+\/)+.+(\.(gif|png|jpg|jpeg|webp|svg|psd|bmp|tif|jfif))$/i.test(data.logoLink))) {
+           return res.status(400).send({ status: false, msg: "Logolink is not in correct format" })
+        };
+
+        //checking college fullname is already registerd or not
+        let isValidfullName = await collegeModel.findOne({fullName:data.fullName});
+        if (isValidfullName) {
+            return res.status(400).send({ status: false, message: "College fullName is already registered", })
+        };
+
+        //checking the name is unique or not
+        let nameCheck = await collegeModel.findOne({ name: data.name });
+        if (!nameCheck) {
+            let college = await collegeModel.create(data)
+           return res.status(200).send({ status: true, msg: "college create successfully", data: college });
         }
-        let ExistedCN = await collegeModel.findOne({ name: data })
-        if (!ExistedCN) {
-            return res.status(400).send({ status: false, message: "The college Name is not existed" })
+        else {
+           return res.status(400).send({ status: false, msg: "Name should be unique" });
         }
+    } catch (err) {
+        console.log("This is the error :", err.message);
+       return res.status(500).send({ msg: "Error", error: err.message });
+    }
 
-        // let coId = await collegeModel.findOne({ name: data })
-        // if (coId.length == 0) {
-        //     return res.status(404).send({ status: false, message: "No such College Name found" })
-        // }
+};
 
-        let coId01 = await collegeModel.findOne({
-            name: data
-        }).select({
-            _id: 0, name: 1, fullName: 1, logoLink: 1
+
+// GET COLLEGE DETAILS   ===============>
+
+const getCollegeDetails = async function (req, res) {
+    
+    try {
+        let data = req.query
+
+        // console.log(data)
+
+        if (Object.keys(data).length == 0) {
+            return res.status(400).send({ status: false, msg: "Please provide the college details" })
+         };
+
+        // let CollegeName = data.collegeName
+
+        // console.log(CollegeName)
+
+        const getCollegeDetail = await collegeModel.findOne({name: data.collegeName})
+
+        // console.log(getCollegeDetail)
+
+        if (!getCollegeDetail) return res.status(404).send({
+            status: false,
+            message: " please provide correct college name"
         })
 
-        console.log(coId01)
 
-        let intern = await internModel.find({ collegeId:  coId01 }).select({ _id: 1, name: 1, email: 1, mobile: 1 })
-        // console.log(intern)
-        let interest = [];
-        interest = interest.concat(intern)
-        console.log(interest)
-        res.send({ data: coId01, interest })
+        const collegeId = getCollegeDetail._id
+
+        // console.log(collegeId)
+
+
+        const findIntern = await internModel.find({
+            collegeId: collegeId,
+            isDeleted: false
+        }).select({ name: 1, email: 1, mobile: 1 })
+
+        // console.log(findIntern)
+ 
+
+        if(findIntern.length == 0) return res.status(404).send({
+            status:false,
+            message :"No intern enrolled with this college" 
+        })
+
+
+        let finalData = {
+            name: getCollegeDetail.name,
+            fullName: getCollegeDetail.fullName,
+            logoLink: getCollegeDetail.logoLink,
+            interns: findIntern
+        }
+
+        // console.log(finalData)
+
+        res.status(200).send({
+            status: true,
+            message: "college interns details",
+            data: finalData
+        })
     }
-    catch {
-        res.status(400).send({ status: false, message: "Bad Request!" })
+    catch (err) {
+        return res.status(500).send({ status: false, message: err.message })
     }
 }
 
-
-
 module.exports.createCollege = createCollege
-module.exports.getData = getData
-
+module.exports.getCollegeDetails = getCollegeDetails
 
 
 
