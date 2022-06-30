@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const collegeModel = require("../model/collegeModel")
-//const internModel = require("../model/internModel")
+const internModel = require("../model/internModel")
 
 const createCollege = async function (req, res) {
     try {
@@ -44,6 +44,7 @@ const createCollege = async function (req, res) {
         };
 
         //checking logo format
+        
         if (!(/^https?:\/\/(.+\/)+.+(\.(gif|png|jpg|jpeg|webp|svg|psd|bmp|tif|jfif))$/i.test(data.logoLink))) {
            return res.status(400).send({ status: false, msg: "Logolink is not in correct format" })
         };
@@ -58,7 +59,7 @@ const createCollege = async function (req, res) {
         let nameCheck = await collegeModel.findOne({ name: data.name });
         if (!nameCheck) {
             let college = await collegeModel.create(data)
-           return res.status(200).send({ status: true, msg: "college create successfully", data: college });
+           return res.status(200).send({ status: true, data: college });
         }
         else {
            return res.status(400).send({ status: false, msg: "Name should be unique" });
@@ -70,4 +71,63 @@ const createCollege = async function (req, res) {
 
 };
 
+
+const getCollegeDetails = async function (req, res) {
+    
+    try {
+        let data = req.query
+         //edge cases
+         //this is college name is empty or not
+
+        if (Object.keys(data).length == 0) {
+            return res.status(400).send({ status: false, msg: "Please provide the college name" })
+         };
+
+         //checking college name in alphabet only
+
+        if (!(/^\s*([a-zA-Z\s\,]){2,64}\s*$/.test(data.collegeName))) {
+          return res.status(400).send({ status: false, msg: "Name should be in alphabat type" })
+        };
+
+        // checking college is valid or not
+
+        const getCollegeDetail = await collegeModel.findOne({name: data.collegeName})
+        // console.log(getCollegeDetail)
+        if (!getCollegeDetail) {
+         return res.status(404).send({status: false,message: " please provide correct college name"})
+         };
+
+        const collegeId = getCollegeDetail._id
+
+        // console.log(collegeId)
+
+        const findIntern = await internModel.find({collegeId: collegeId,isDeleted: false }).select({ name: 1, email: 1, mobile: 1 })
+
+        // console.log(findIntern)
+ 
+        //checking any intern is present or not
+        if(findIntern.length == 0) {
+         return res.status(404).send({status:false, message :"No intern enrolled with this college" })
+         };
+
+
+        let finalData = {
+            name: getCollegeDetail.name,
+            fullName: getCollegeDetail.fullName,
+            logoLink: getCollegeDetail.logoLink,
+            interns: findIntern
+        }
+
+       return res.status(200).send({status: true,message: "college interns details",data: finalData})
+   
+   } catch (err) {
+   console.log("This is the error :", err.message);
+   return res.status(500).send({ msg: "Error", error: err.message });
+   }
+};
+
 module.exports.createCollege = createCollege
+module.exports.getCollegeDetails = getCollegeDetails
+
+
+
