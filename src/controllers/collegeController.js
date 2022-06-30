@@ -11,7 +11,16 @@ const createCollege = async function (req, res) {
       if (Object.keys(data).length == 0) {
          return res.status(400).send({ status: false, msg: "Please provide the college details" })
       };
+      if ((!data.fullName && !data.logoLink)) {
+         return res.status(400).send({ status: false, msg: "somthing missing1" })
+      };
 
+       if ((!data.name && !data.fullName)) {
+          return res.status(400).send({ status: false, msg: "somthing missing2" })
+       };
+       if ((!data.name && !data.logoLink)) {
+          return res.status(400).send({ status: false, msg: "somthing missing3" })
+       };
       //particular each required feild is mandetory
       if (!data.name) {
          return res.status(400).send({ status: false, msg: "Name is required" })
@@ -22,18 +31,7 @@ const createCollege = async function (req, res) {
       if (!data.logoLink) {
          return res.status(400).send({ status: false, msg: "logoLink is required" })
       };
-      //doubt
-      //  if (!(data.fullName && data.logoLink)) {
-      //     return res.status(400).send({ status: false, msg: "somthing missing1" })
-      //  };
-      //  if (!(data.name && data.fullName)) {
-      //     return res.status(400).send({ status: false, msg: "somthing missing2" })
-      //  };
-      //  if (!(data.name && data.logoLink)) {
-      //     return res.status(400).send({ status: false, msg: "somthing missing3" })
-      //  };
-
-
+  
       //checking name and fullname in alphabet only
 
       if (!(/^\s*([a-zA-Z])([^0-9]){2,64}\s*$/.test(data.name))) {
