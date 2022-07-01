@@ -64,7 +64,7 @@ const createIntern = async function (req, res) {
         if (collegeCheck) {
 
             let college = await internModel.create(data)
-            return res.status(200).send({ status: true, data: college })
+            return res.status(201).send({ status: true, data: college })
         }
         else {
             return res.status(400).send({ status: false, msg: "CollegeId was not found" })
