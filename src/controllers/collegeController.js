@@ -58,7 +58,7 @@ const createCollege = async function (req, res) {
       let nameCheck = await collegeModel.findOne({ name: data.name });
       if (!nameCheck) {
          let college = await collegeModel.create(data)
-         return res.status(200).send({ status: true, data: college });
+         return res.status(201).send({ status: true, data: college });
       }
       else {
          return res.status(400).send({ status: false, msg: "Name should be unique" });
